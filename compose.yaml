@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: kanban-app-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kanban-app
+    ports:
+      - "5432:5432"
+    volumes:
+      - kanban_app_db_data:/var/lib/postgresql/data
+volumes:
+  kanban_app_db_data:
