@@ -42,6 +42,10 @@ export async function createBoard(formData: FormData) {
 
     redirect(`/boards/${board.id}`);
   } catch (error) {
+    // リダイレクトエラーは正常な動作なので再投げする
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+      throw error;
+    }
     console.error("Failed to create board:", error);
     throw new Error("ボードの作成に失敗しました");
   }

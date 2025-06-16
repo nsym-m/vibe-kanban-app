@@ -25,6 +25,10 @@ export function CreateBoardDialog() {
       await createBoard(formData);
       setOpen(false);
     } catch (error) {
+      // リダイレクトエラーは正常な動作なので無視する
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+        return;
+      }
       console.error("Failed to create board:", error);
     } finally {
       setIsLoading(false);
