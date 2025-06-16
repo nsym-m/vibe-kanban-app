@@ -1,3 +1,5 @@
+import { getExpiredTaskInfo } from "@/lib/task-utils";
+
 interface TaskCardProps {
   task: {
     id: string;
@@ -16,9 +18,18 @@ export function TaskCard({ task }: TaskCardProps) {
     URGENT: "bg-red-500",
   };
 
+  const expiredInfo = getExpiredTaskInfo(task.dueDate);
+
   return (
-    <div className="bg-background border rounded-lg p-3 shadow-sm">
-      <h3 className="font-medium mb-1">{task.title}</h3>
+    <div className={`bg-background border rounded-lg p-3 shadow-sm ${
+      expiredInfo.isExpired ? 'border-red-500 border-2' : ''
+    }`}>
+      <div className="flex items-center gap-2 mb-1">
+        <h3 className="font-medium flex-1">{task.title}</h3>
+        {expiredInfo.isExpired && (
+          <span className="text-red-500" title="期限切れ">⚠️</span>
+        )}
+      </div>
       {task.description && (
         <p className="text-sm text-muted-foreground mb-2">
           {task.description}
@@ -31,9 +42,16 @@ export function TaskCard({ task }: TaskCardProps) {
           {task.priority}
         </span>
         {task.dueDate && (
-          <span className="text-muted-foreground">
-            {new Date(task.dueDate).toLocaleDateString("ja-JP")}
-          </span>
+          <div className="flex flex-col items-end">
+            <span className={expiredInfo.isExpired ? "text-red-500" : "text-muted-foreground"}>
+              {new Date(task.dueDate).toLocaleDateString("ja-JP")}
+            </span>
+            {expiredInfo.isExpired && (
+              <span className="text-red-500 text-xs">
+                {expiredInfo.relativeText}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>

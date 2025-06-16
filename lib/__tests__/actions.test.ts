@@ -7,6 +7,27 @@ import { prisma } from '../prisma'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
+type MockBoard = {
+  id: string
+  title: string
+  description?: string | null
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+type MockTask = {
+  id: string
+  title: string
+  description?: string | null
+  position?: number
+  priority?: string
+  dueDate?: Date | null
+  isCompleted?: boolean
+  columnId?: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 jest.mock('../prisma', () => ({
   prisma: {
     board: {
@@ -39,7 +60,7 @@ describe('Server Actions', () => {
   describe('createBoard', () => {
     it('creates a board with title and description', async () => {
       const mockBoard = { id: '1', title: 'Test Board' }
-      mockPrisma.board.create.mockResolvedValue(mockBoard as any)
+      mockPrisma.board.create.mockResolvedValue(mockBoard as MockBoard)
       mockRedirect.mockImplementation(() => {
         throw new Error('NEXT_REDIRECT')
       })
@@ -81,7 +102,7 @@ describe('Server Actions', () => {
 
     it('creates a board without description when not provided', async () => {
       const mockBoard = { id: '2', title: 'Board Without Description' }
-      mockPrisma.board.create.mockResolvedValue(mockBoard as any)
+      mockPrisma.board.create.mockResolvedValue(mockBoard as MockBoard)
       mockRedirect.mockImplementation(() => {
         throw new Error('NEXT_REDIRECT')
       })
@@ -122,7 +143,17 @@ describe('Server Actions', () => {
   describe('createTask', () => {
     it('creates a task with all fields', async () => {
       mockPrisma.task.count.mockResolvedValue(2)
-      mockPrisma.task.create.mockResolvedValue({} as any)
+      const mockTask: MockTask = {
+        id: 'task-1',
+        title: 'Test Task',
+        description: 'Test Description',
+        position: 2,
+        priority: 'HIGH',
+        dueDate: new Date('2024-12-31'),
+        isCompleted: false,
+        columnId: 'column-1'
+      }
+      mockPrisma.task.create.mockResolvedValue(mockTask)
 
       const formData = new FormData()
       formData.append('title', 'Test Task')
@@ -154,7 +185,15 @@ describe('Server Actions', () => {
 
     it('creates a task with minimum required fields', async () => {
       mockPrisma.task.count.mockResolvedValue(0)
-      mockPrisma.task.create.mockResolvedValue({} as any)
+      const mockTask: MockTask = {
+        id: 'task-2',
+        title: 'Minimal Task',
+        position: 0,
+        priority: 'MEDIUM',
+        isCompleted: false,
+        columnId: 'column-1'
+      }
+      mockPrisma.task.create.mockResolvedValue(mockTask)
 
       const formData = new FormData()
       formData.append('title', 'Minimal Task')
