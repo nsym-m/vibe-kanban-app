@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { KanbanColumn } from "@/components/kanban-column";
 
 interface BoardPageProps {
   params: Promise<{
@@ -55,60 +56,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {board.columns.map((column) => (
-          <div key={column.id} className="bg-muted/30 rounded-lg p-4">
-            <div className="flex items-center mb-4">
-              <div
-                className="w-3 h-3 rounded-full mr-2"
-                style={{ backgroundColor: column.color }}
-              />
-              <h2 className="font-semibold">{column.title}</h2>
-              <span className="ml-auto text-sm text-muted-foreground">
-                {column.tasks.length}
-              </span>
-            </div>
-            
-            <div className="space-y-3">
-              {column.tasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="bg-background border rounded-lg p-3 shadow-sm"
-                >
-                  <h3 className="font-medium mb-1">{task.title}</h3>
-                  {task.description && (
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {task.description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between text-xs">
-                    <span
-                      className={`px-2 py-1 rounded-full text-white ${
-                        task.priority === "LOW"
-                          ? "bg-gray-500"
-                          : task.priority === "MEDIUM"
-                          ? "bg-blue-500"
-                          : task.priority === "HIGH"
-                          ? "bg-orange-500"
-                          : "bg-red-500"
-                      }`}
-                    >
-                      {task.priority}
-                    </span>
-                    {task.dueDate && (
-                      <span className="text-muted-foreground">
-                        {new Date(task.dueDate).toLocaleDateString("ja-JP")}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-              
-              {column.tasks.length === 0 && (
-                <div className="text-center text-muted-foreground py-8">
-                  タスクがありません
-                </div>
-              )}
-            </div>
-          </div>
+          <KanbanColumn key={column.id} column={column} />
         ))}
       </div>
     </div>
