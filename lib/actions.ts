@@ -86,3 +86,35 @@ export async function createTask(formData: FormData) {
     throw new Error("タスクの作成に失敗しました");
   }
 }
+
+export async function createColumn(formData: FormData) {
+  const title = formData.get("title") as string;
+  const color = formData.get("color") as string;
+  const boardId = formData.get("boardId") as string;
+
+  if (!title || !boardId) {
+    throw new Error("必須項目が入力されていません");
+  }
+
+  try {
+    // 該当ボードの既存カラム数を取得して新しいカラムのpositionを決定
+    const columnCount = await prisma.column.count({
+      where: { boardId },
+    });
+
+    await prisma.column.create({
+      data: {
+        title,
+        color: color || "#94a3b8",
+        boardId,
+        position: columnCount,
+      },
+    });
+
+    // ページを再検証してデータを更新
+    revalidatePath(`/boards/${boardId}`);
+  } catch (error) {
+    console.error("Failed to create column:", error);
+    throw new Error("カラムの作成に失敗しました");
+  }
+}

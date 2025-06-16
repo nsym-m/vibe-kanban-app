@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { KanbanColumn } from "@/components/kanban-column";
+import { AddColumn } from "@/components/add-column";
 
 interface BoardPageProps {
   params: Promise<{
@@ -54,10 +55,15 @@ export default async function BoardPage({ params }: BoardPageProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="flex gap-6 overflow-x-auto pb-4">
         {board.columns.map((column) => (
-          <KanbanColumn key={column.id} column={column} boardId={board.id} />
+          <div key={column.id} className="flex-shrink-0 w-80">
+            <KanbanColumn column={column} boardId={board.id} />
+          </div>
         ))}
+        <div className="flex-shrink-0 w-80">
+          <AddColumn boardId={board.id} />
+        </div>
       </div>
     </div>
   );
