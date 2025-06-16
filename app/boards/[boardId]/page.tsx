@@ -56,7 +56,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {board.columns.map((column) => (
-          <KanbanColumn key={column.id} column={column} />
+          <KanbanColumn key={column.id} column={column} boardId={board.id} />
         ))}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { TaskCard } from "./task-card";
+import { AddTaskDialog } from "./add-task-dialog";
 
 interface KanbanColumnProps {
   column: {
@@ -13,9 +14,10 @@ interface KanbanColumnProps {
       dueDate: Date | null;
     }[];
   };
+  boardId: string;
 }
 
-export function KanbanColumn({ column }: KanbanColumnProps) {
+export function KanbanColumn({ column, boardId }: KanbanColumnProps) {
   return (
     <div className="bg-muted/30 rounded-lg p-4">
       <div className="flex items-center mb-4">
@@ -39,6 +41,8 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
             タスクがありません
           </div>
         )}
+        
+        <AddTaskDialog columnId={column.id} boardId={boardId} />
       </div>
     </div>
   );

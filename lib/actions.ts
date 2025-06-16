@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export async function createBoard(formData: FormData) {
@@ -46,5 +47,42 @@ export async function createBoard(formData: FormData) {
     }
     console.error("Failed to create board:", error);
     throw new Error("ボードの作成に失敗しました");
+  }
+}
+
+export async function createTask(formData: FormData) {
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  const dueDate = formData.get("dueDate") as string;
+  const columnId = formData.get("columnId") as string;
+  const boardId = formData.get("boardId") as string;
+
+  if (!title || !columnId || !boardId) {
+    throw new Error("必須項目が入力されていません");
+  }
+
+  try {
+    // 該当カラムの既存タスク数を取得して新しいタスクのpositionを決定
+    const taskCount = await prisma.task.count({
+      where: { columnId },
+    });
+
+    await prisma.task.create({
+      data: {
+        title,
+        description: description || null,
+        priority: priority || "MEDIUM",
+        dueDate: dueDate ? new Date(dueDate) : null,
+        columnId,
+        position: taskCount,
+      },
+    });
+
+    // ページを再検証してデータを更新
+    revalidatePath(`/boards/${boardId}`);
+  } catch (error) {
+    console.error("Failed to create task:", error);
+    throw new Error("タスクの作成に失敗しました");
   }
 }
