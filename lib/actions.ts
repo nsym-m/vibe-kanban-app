@@ -1,9 +1,7 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function createBoard(formData: FormData) {
   const title = formData.get("title") as string;
